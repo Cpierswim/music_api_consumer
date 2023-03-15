@@ -23,6 +23,9 @@ class MusicLibraryInterface():
             if selection == Helper.DELETE_BY_ID:
                 selection = MusicLibraryInterface.__get_song_selection()
                 MusicLibraryInterface.__delete_song_by_id(selection)
+            if selection == Helper.LIKE_BY_ID:
+                selection = MusicLibraryInterface.__get_song_selection()
+                MusicLibraryInterface.__like_song(selection)
 
 
     @staticmethod
@@ -37,6 +40,7 @@ class MusicLibraryInterface():
         print("--------")
         print(f"{Helper.DISPLAY_ALL_SONGS}. Display ALL songs in the library")
         print(f"{Helper.INFO_BY_ID}. Get Full info of a certain by song")
+        print(f"{Helper.LIKE_BY_ID}. Like a song")
         print(f"{Helper.DELETE_BY_ID}. Delete a song")
         print(f"{Helper.QUIT}. Quit")
         print("")
@@ -66,6 +70,8 @@ class MusicLibraryInterface():
         elif selection_as_int == Helper.INFO_BY_ID:
             return True, selection_as_int
         elif selection_as_int == Helper.DELETE_BY_ID:
+            return True, selection_as_int
+        elif selection_as_int == Helper.LIKE_BY_ID:
             return True, selection_as_int
         return False, None
 
@@ -136,6 +142,20 @@ class MusicLibraryInterface():
             print("No song found by that ID Number\n")
 
         
-        
+    @staticmethod
+    def __like_song(id: int) -> None:
+        Helper.clearscreen()
+        response = requests.get(f"http://127.0.0.1:5000/api/songs/{id}")
 
+        try:
+            song = Song.song_decoder(response.json())
+            print(f"Liking \"{song.title}\" by {song.artist}")
 
+            like_response = requests.put(f"http://127.0.0.1:5000/api/add_like/{id}")
+
+            if like_response.status_code == 200:
+                print(".....liked")
+            else:
+                print(".....there was an error liking the song")
+        except:
+            print("No song found by that ID Number\n")
