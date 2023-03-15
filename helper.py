@@ -3,6 +3,7 @@ from os import system, name
 class Helper():
 
     DISPLAY_ALL_SONGS = 1
+    QUIT = 2
 
     @staticmethod
     def display_songs(song_list):

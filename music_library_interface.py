@@ -11,19 +11,25 @@ class MusicLibraryInterface():
 
     def run(self):
         MusicLibraryInterface.__display_welcome()
-        MusicLibraryInterface.__display_options()
-        selection = MusicLibraryInterface.__display_options_get_selection()
-        if selection == Helper.DISPLAY_ALL_SONGS:
-            MusicLibraryInterface.__display_all_songs()
+        selection = -100
+        while selection != Helper.QUIT:
+            MusicLibraryInterface.__display_options()
+            selection = MusicLibraryInterface.__display_options_get_selection()
+            if selection == Helper.DISPLAY_ALL_SONGS:
+                MusicLibraryInterface.__display_all_songs()
 
     @staticmethod
     def __display_welcome():
         Helper.clearscreen()
-        print("Welcome to the Music Library API Interface\n\nWhat would you like to do?\n")
+        print("Welcome to the Music Library API Interface\n\nWhat would you like to do?")
 
     @staticmethod
     def __display_options():
-        print("1. Display ALL songs in the library")
+        print("\n")
+        print("OPTIONS: ")
+        print("--------")
+        print(f"{Helper.DISPLAY_ALL_SONGS}. Display ALL songs in the library")
+        print(f"{Helper.QUIT}. Quit")
         print("")
 
     @staticmethod
@@ -46,19 +52,19 @@ class MusicLibraryInterface():
         
         if selection_as_int == Helper.DISPLAY_ALL_SONGS:
             return True, selection_as_int
+        elif selection_as_int == Helper.QUIT:
+            return True, selection_as_int
         return False, None
 
     @staticmethod
     def __display_all_songs():
         response = requests.get("http://127.0.0.1:5000/api/songs")
 
-        test1 = response.content
         songs_json = response.json()
 
         song_list = []
         for song in songs_json:
             song_list.append(Song.song_decoder(song))
-
 
         Helper.clearscreen()
         print(f"There are {len(song_list)} songs in the library: \n\n")
