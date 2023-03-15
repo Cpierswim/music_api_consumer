@@ -2,7 +2,7 @@ import requests
 import json
 from song import Song
 from helper import Helper
-
+from datetime import datetime
 
 
 
@@ -26,6 +26,8 @@ class MusicLibraryInterface():
             if selection == Helper.LIKE_BY_ID:
                 selection = MusicLibraryInterface.__get_song_selection()
                 MusicLibraryInterface.__like_song(selection)
+            if selection == Helper.ADD_NEW_SONG:
+                MusicLibraryInterface.__add_new_song()
 
 
     @staticmethod
@@ -41,6 +43,7 @@ class MusicLibraryInterface():
         print(f"{Helper.DISPLAY_ALL_SONGS}. Display ALL songs in the library")
         print(f"{Helper.INFO_BY_ID}. Get Full info of a certain by song")
         print(f"{Helper.LIKE_BY_ID}. Like a song")
+        print(f"{Helper.ADD_NEW_SONG}. Add a new song")
         print(f"{Helper.DELETE_BY_ID}. Delete a song")
         print(f"{Helper.QUIT}. Quit")
         print("")
@@ -72,6 +75,8 @@ class MusicLibraryInterface():
         elif selection_as_int == Helper.DELETE_BY_ID:
             return True, selection_as_int
         elif selection_as_int == Helper.LIKE_BY_ID:
+            return True, selection_as_int
+        elif selection_as_int == Helper.ADD_NEW_SONG:
             return True, selection_as_int
         return False, None
 
@@ -159,3 +164,73 @@ class MusicLibraryInterface():
                 print(".....there was an error liking the song")
         except:
             print("No song found by that ID Number\n")
+
+    @staticmethod
+    def __add_new_song() -> None:
+        Helper.clearscreen()
+        print("Please enter all requried information:\n")
+        valid = False
+        title = None
+        while (not valid):
+            title = input("  Song title: ")
+            title = title.strip()
+            if title != "":
+                valid = True
+            else:
+                print("Please try again.")
+        valid = False
+        artist = None
+        while (not valid):
+            artist = input("      Artist: ")
+            artist = artist.strip()
+            if artist != "":
+                valid = True
+            else:
+                print("Please try again.")
+        valid = False
+        album = None
+        while (not valid):
+            album = input("       Album: ")
+            album = album.strip()
+            if album != "":
+                valid = True
+            else:
+                print("Please try again.")
+        valid = False
+        release_date = None
+        while (not valid):
+            release_date = input("Release Date (YYYY-MM-DD): ")
+            release_date = release_date.strip()
+            if release_date != "":
+                try:
+                    date = datetime.strptime(release_date, "%Y-%m-%d")
+                    valid = True
+                except:
+                    print(f"Date unrecognized, please use this format: YYYY-MM-DD, so today would be {datetime.now():%Y-%m-%d}")
+            else:
+                print("Please try again.")
+        valid = False
+        genre = None
+        while (not valid):
+            genre = input("       Genre: ")
+            genre = genre.strip()
+            if genre != "":
+                valid = True
+            else:
+                print("Please try again.")
+
+        new_song = Song(None, title=title, artist=artist, album=album, release_date=release_date, genre=genre)
+        
+        
+        new_song_json_string = new_song.jsonify_for_insert()
+        new_song_json = json.loads(new_song_json_string)
+        response = requests.post(f"http://127.0.0.1:5000/api/songs", json=new_song_json)
+
+        if response.status_code == 201:
+            song_with_id = Song.song_decoder(response.json())
+            print(f"\nSong \"{new_song.title}\" sucessfully added as Song #{song_with_id.id}")
+        else:
+            print("\nThere was an error adding the song.")
+
+
+       

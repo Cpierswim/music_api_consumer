@@ -1,12 +1,15 @@
 from os import system, name
+from json import JSONEncoder
+import datetime
 
 class Helper():
 
     DISPLAY_ALL_SONGS = 1
     INFO_BY_ID = 2
     LIKE_BY_ID = 3
-    DELETE_BY_ID = 4
-    QUIT = 5
+    ADD_NEW_SONG = 4
+    DELETE_BY_ID = 5
+    QUIT = 6
 
     @staticmethod
     def clearscreen():
