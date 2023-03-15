@@ -28,3 +28,8 @@ class Song():
         else:
             custom_date_string = self.release_date.strftime("%B %d, %Y")
         return f"{rjustid}: {ljusttitleandartist}{ljustalbum} Released: {custom_date_string} ({self.genre} genre)"
+    
+    def partial_string(self) -> str:
+        rjustid = "#" + str(self.id)
+        rjustid = rjustid.rjust(4)
+        return f"{rjustid} \"{self.title}\", by {self.artist}"
