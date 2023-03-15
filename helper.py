@@ -3,8 +3,9 @@ from os import system, name
 class Helper():
 
     DISPLAY_ALL_SONGS = 1
-    QUIT = 3
+    QUIT = 4
     INFO_BY_ID = 2
+    DELETE_BY_ID = 3
 
     @staticmethod
     def clearscreen():

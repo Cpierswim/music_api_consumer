@@ -20,6 +20,10 @@ class MusicLibraryInterface():
             if selection == Helper.INFO_BY_ID:
                 selection = MusicLibraryInterface.__get_song_selection()
                 MusicLibraryInterface.__display_all_info(selection)
+            if selection == Helper.DELETE_BY_ID:
+                selection = MusicLibraryInterface.__get_song_selection()
+                MusicLibraryInterface.__delete_song_by_id(selection)
+
 
     @staticmethod
     def __display_welcome():
@@ -33,6 +37,7 @@ class MusicLibraryInterface():
         print("--------")
         print(f"{Helper.DISPLAY_ALL_SONGS}. Display ALL songs in the library")
         print(f"{Helper.INFO_BY_ID}. Get Full info of a certain by song")
+        print(f"{Helper.DELETE_BY_ID}. Delete a song")
         print(f"{Helper.QUIT}. Quit")
         print("")
 
@@ -60,6 +65,8 @@ class MusicLibraryInterface():
             return True, selection_as_int
         elif selection_as_int == Helper.INFO_BY_ID:
             return True, selection_as_int
+        elif selection_as_int == Helper.DELETE_BY_ID:
+            return True, selection_as_int
         return False, None
 
     @staticmethod
@@ -79,7 +86,7 @@ class MusicLibraryInterface():
 
     @staticmethod
     def __get_song_selection():
-        selection = input("Enter song ID: ")
+        selection = input("Enter song ID Number: ")
         try:
             id = int(selection)
             return id
@@ -108,4 +115,27 @@ class MusicLibraryInterface():
             print("\n")
         except:
             print("No song found by that ID Number\n")
+
+    @staticmethod
+    def __delete_song_by_id(id: int) -> None:
+        Helper.clearscreen()
+        response = requests.get(f"http://127.0.0.1:5000/api/songs/{id}")
+
+        try:
+            song = Song.song_decoder(response.json())
+            print(f"Deleting \"{song.title}\" by {song.artist}")
+
+            delete_response = requests.delete(f"http://127.0.0.1:5000/api/songs/{id}")
+
+            if delete_response.status_code == 204:
+                print(".....sucessfully deleted")
+            else:
+                print(".....there was an error deleting the song")
+            print("")
+        except:
+            print("No song found by that ID Number\n")
+
+        
+        
+
 
