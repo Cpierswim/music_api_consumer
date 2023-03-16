@@ -17,17 +17,21 @@ class MusicLibraryInterface():
             selection = MusicLibraryInterface.__get_selection()
             if selection == Helper.DISPLAY_ALL_SONGS:
                 MusicLibraryInterface.__display_all_songs()
-            if selection == Helper.INFO_BY_ID:
+            elif selection == Helper.INFO_BY_ID:
                 selection = MusicLibraryInterface.__get_song_selection()
                 MusicLibraryInterface.__display_all_info(selection)
-            if selection == Helper.DELETE_BY_ID:
+            elif selection == Helper.DELETE_BY_ID:
                 selection = MusicLibraryInterface.__get_song_selection()
                 MusicLibraryInterface.__delete_song_by_id(selection)
-            if selection == Helper.LIKE_BY_ID:
+            elif selection == Helper.LIKE_BY_ID:
                 selection = MusicLibraryInterface.__get_song_selection()
                 MusicLibraryInterface.__like_song(selection)
-            if selection == Helper.ADD_NEW_SONG:
+            elif selection == Helper.ADD_NEW_SONG:
                 MusicLibraryInterface.__add_new_song()
+            elif selection == Helper.UPDATE_SONG:
+                selection = MusicLibraryInterface.__get_song_selection()
+                MusicLibraryInterface.__update_song(selection)
+            
 
 
     @staticmethod
@@ -43,6 +47,7 @@ class MusicLibraryInterface():
         print(f"{Helper.DISPLAY_ALL_SONGS}. Display ALL songs in the library")
         print(f"{Helper.INFO_BY_ID}. Get Full info of a certain by song")
         print(f"{Helper.LIKE_BY_ID}. Like a song")
+        print(f"{Helper.UPDATE_SONG}. Change a song's information")
         print(f"{Helper.ADD_NEW_SONG}. Add a new song")
         print(f"{Helper.DELETE_BY_ID}. Delete a song")
         print(f"{Helper.QUIT}. Quit")
@@ -78,6 +83,8 @@ class MusicLibraryInterface():
             return True, selection_as_int
         elif selection_as_int == Helper.ADD_NEW_SONG:
             return True, selection_as_int
+        elif selection_as_int == Helper.UPDATE_SONG:
+            return True, selection_as_int
         return False, None
 
     @staticmethod
@@ -106,8 +113,9 @@ class MusicLibraryInterface():
             return MusicLibraryInterface.__get_song_selection()
 
     staticmethod
-    def __display_all_info(id:int):
-        Helper.clearscreen()
+    def __display_all_info(id:int, clear:bool=True, display_likes:bool=True) -> bool:
+        if clear:
+            Helper.clearscreen()
         response = requests.get(f"http://127.0.0.1:5000/api/songs/{id}")
 
         try:
@@ -122,10 +130,14 @@ class MusicLibraryInterface():
                 custom_date_string = song.release_date.strftime("%B %d, %Y")
             print(f"Release Date: {custom_date_string}")
             print(f"       Genre: {song.genre}")
-            print(f"       Likes: {song.likes}")
+            if display_likes:
+                print(f"       Likes: {song.likes}")
             print("\n")
+
+            return True
         except:
             print("No song found by that ID Number\n")
+            return False
 
     @staticmethod
     def __delete_song_by_id(id: int) -> None:
@@ -232,5 +244,57 @@ class MusicLibraryInterface():
         else:
             print("\nThere was an error adding the song.")
 
+    @staticmethod
+    def __update_song(id: int) -> None:
+        Helper.clearscreen()
+        songfound = MusicLibraryInterface.__display_all_info(id, clear=False, display_likes=False)
+        if not songfound:
+            return None
+        
+        print("--NOTE: To save programming time, you can only change one piece of information at a time--")
+        key = MusicLibraryInterface.__get_input_key()
 
-       
+        updated_info = ""
+
+        while updated_info == "":
+            if not key == "release_date":
+                updated_info = input("Change to: ")
+            else:
+                updated_info = input("Change to (YYYY-MM-DD): ")
+            updated_info = updated_info.strip()
+
+            if key == "release_date":
+                try:
+                    updated_info = datetime.strptime(updated_info, "%Y-%m-%d").strftime("%Y-%m-%d")
+                except:
+                    updated_info = "date error"
+
+            if updated_info == "":
+                print("Please enter something")
+            elif updated_info == "date error":
+                updated_info = ""
+                print("There was an error with that date, please try again")
+
+        json_string = "{\"" + key + "\":\"" + updated_info + "\"}"
+        update_json = json.loads(json_string)
+
+        response = requests.put(f"http://127.0.0.1:5000/api/songs/{id}", json=update_json)
+
+        if response.status_code == 200:
+            print("\nSucesfully updated")
+        else:
+            print("\nThere was an error updating the information")
+
+        
+
+    @staticmethod
+    def __get_input_key() -> str:
+        key = input("\nWhat would you like to change: ")
+        key = key.lower().strip()
+        if key == "title" or key == "artist" or key == "album" or key == "genre":
+            return key
+        elif key == "release" or key == "release date" or key == "release_date" or key == "date":
+            return "release_date"
+        else:
+            print("ERROR: Input misunderstood")
+            return MusicLibraryInterface.__get_input_key()

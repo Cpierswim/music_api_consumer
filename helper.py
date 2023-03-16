@@ -7,9 +7,10 @@ class Helper():
     DISPLAY_ALL_SONGS = 1
     INFO_BY_ID = 2
     LIKE_BY_ID = 3
-    ADD_NEW_SONG = 4
-    DELETE_BY_ID = 5
-    QUIT = 6
+    UPDATE_SONG = 4
+    ADD_NEW_SONG = 5
+    DELETE_BY_ID = 6
+    QUIT = 7
 
     @staticmethod
     def clearscreen():
