@@ -18,19 +18,19 @@ class MusicLibraryInterface():
             if selection == Helper.DISPLAY_ALL_SONGS:
                 MusicLibraryInterface.__display_all_songs()
             elif selection == Helper.INFO_BY_ID:
-                selection = MusicLibraryInterface.__get_song_selection()
-                MusicLibraryInterface.__display_all_info(selection)
+                song_id = MusicLibraryInterface.__get_song_selection()
+                MusicLibraryInterface.__display_all_info(song_id)
             elif selection == Helper.DELETE_BY_ID:
-                selection = MusicLibraryInterface.__get_song_selection()
-                MusicLibraryInterface.__delete_song_by_id(selection)
+                song_id = MusicLibraryInterface.__get_song_selection()
+                MusicLibraryInterface.__delete_song_by_id(song_id)
             elif selection == Helper.LIKE_BY_ID:
-                selection = MusicLibraryInterface.__get_song_selection()
-                MusicLibraryInterface.__like_song(selection)
+                song_id = MusicLibraryInterface.__get_song_selection()
+                MusicLibraryInterface.__like_song(song_id)
             elif selection == Helper.ADD_NEW_SONG:
                 MusicLibraryInterface.__add_new_song()
             elif selection == Helper.UPDATE_SONG:
-                selection = MusicLibraryInterface.__get_song_selection()
-                MusicLibraryInterface.__update_song(selection)
+                song_id = MusicLibraryInterface.__get_song_selection()
+                MusicLibraryInterface.__update_song(song_id)
             
 
 
